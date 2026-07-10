@@ -1,0 +1,94 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  name          String?
+  passwordHash  String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  preferences   Preference?
+  jobs          Job[]
+  notifications Notification[]
+}
+
+model Preference {
+  id                 String  @id @default(uuid())
+  userId             String  @unique
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme              String  @default("dark") // "dark" | "light"
+  emailNotifications Boolean @default(true)
+  savedFilters       String  @default("[]") // JSON serialized array of filters
+}
+
+model Worker {
+  id             String   @id @default(uuid())
+  name           String   @unique
+  status         String   @default("idle") // "idle" | "busy" | "offline"
+  cpu            Float    @default(0.0)
+  memory         Float    @default(0.0)
+  jobsActive     Int      @default(0)
+  jobsCompleted  Int      @default(0)
+  lastSeen       DateTime @default(now())
+  jobs           Job[]
+}
+
+model Job {
+  id                String       @id @default(uuid())
+  ownerId           String
+  owner             User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  workerId          String?
+  worker            Worker?      @relation(fields: [workerId], references: [id], onDelete: SetNull)
+  priority          String       @default("medium") // "low" | "medium" | "high" | "critical"
+  status            String       @default("queued") // "queued" | "preparing" | "worker_assigned" | "running" | "processing" | "aggregating" | "saving" | "completed" | "failed" | "cancelled"
+  progress          Float        @default(0.0) // 0 to 100
+  type              String       // "model_training" | "data_ingestion" | "sentiment_analysis" | "report_generation" | "image_processing"
+  createdAt         DateTime     @default(now())
+  startedAt         DateTime?
+  completedAt       DateTime?
+  estimatedDuration Int          @default(30) // in seconds
+  logs              Log[]
+  history           JobHistory[]
+  failureReason     String?
+  failureFix        String?      // AI failure suggestions (rule-based)
+  failureCauses     String?      // JSON string list of causes
+  output            String?      // JSON string of execution results
+}
+
+model Log {
+  id        String   @id @default(uuid())
+  jobId     String
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  timestamp DateTime @default(now())
+  level     String   @default("info") // "info" | "warn" | "error" | "debug"
+  message   String
+}
+
+model JobHistory {
+  id        String   @id @default(uuid())
+  jobId     String
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  status    String
+  changedAt DateTime @default(now())
+  message   String
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   @default("job_status") // "job_status" | "worker_status" | "system_alert"
+  status    String   @default("unread") // "unread" | "read" | "archived"
+  jobId     String?
+  createdAt DateTime @default(now())
+  groupKey  String?  // e.g. "job_completed_2026-07-10" to support smart grouping
+}
