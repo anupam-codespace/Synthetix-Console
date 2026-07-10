@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Synthetix Console',
-  description: 'AI Job Monitoring & Notification Platform',
+  description: 'Job Monitoring & Notification Platform',
 };
 
 export default function RootLayout({

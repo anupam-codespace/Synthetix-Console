@@ -55,14 +55,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Demo Credentials Alert Banner */}
-        <div className="rounded-lg border border-emerald-950/40 bg-emerald-500/5 p-3 text-xs text-emerald-400">
-          <p className="font-semibold mb-0.5">Quick Play Credentials</p>
-          <p className="font-mono text-[11px] opacity-90">
-            Email: <span className="underline">admin@synthetix.dev</span><br />
-            Password: <span className="underline">adminpass</span>
-          </p>
-        </div>
+
 
         {/* Error message */}
         {error && (

@@ -275,12 +275,12 @@ export function JobDrawer() {
                       </div>
                     </div>
 
-                    {/* AI Failure Summary Card */}
+                    {/* Failure Diagnostic Summary */}
                     {job.status === 'failed' && (
                       <div className="rounded-lg border border-rose-950/20 bg-rose-500/5 p-4 space-y-3 text-xs">
                         <div className="flex items-start gap-2 text-rose-500 font-bold">
                           <AlertTriangle className="h-4 w-4 shrink-0" />
-                          <span>AI Failure Diagnostics</span>
+                          <span>Failure Diagnostics</span>
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">Execution Failure:</span>
